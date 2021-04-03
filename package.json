@@ -1,6 +1,6 @@
 {
   "name": "terminus-sync-config",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Sync configuration files to GitHub Gist or Gitee Gist",
   "keywords": [
     "terminus-plugin"

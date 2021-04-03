@@ -22,14 +22,23 @@ h3 Sync Config
                 [(ngModel)]='config.store.syncConfig.token', 
                 (ngModelChange)='config.save()',
             )
-        .form-group
-            label Gist
-            input.form-control(
-                type='text', 
-                placeholder="use existing gist id or automatic generation gist id",
-                [(ngModel)]='config.store.syncConfig.gist', 
-                (ngModelChange)='config.save()',
-            )
+        .form-row
+            .form-group.col-md-9
+                label Gist
+                input.form-control(
+                    type='text', 
+                    placeholder="use existing gist id or automatic generation gist id",
+                    [(ngModel)]='config.store.syncConfig.gist', 
+                    (ngModelChange)='config.save()',
+                )
+            .form-group.col-md-3.d-none.d-md-block
+                label &nbsp;&nbsp;
+                button.btn.btn-outline-secondary.form-control(
+                    [disabled]='config.store.syncConfig.gist === "" || config.store.syncConfig.type !== "GitHub"',
+                    (click)='viewGist(config.store.syncConfig.type,config.store.syncConfig.gist)'
+                )
+                    div.fa.fa-fw.fa-eye
+                    span.ml-2 View
         .form-group
             button.btn.btn-outline-primary.mr-3(
                 (click)='sync(true)',
@@ -38,6 +47,7 @@ h3 Sync Config
                 div.fa.fa-fw.fa-upload(*ngIf='!isUploading')
                 div.fa.fa-cog.fa-spin(*ngIf='isUploading')
                 span.ml-2 Upload config
+            .mt-3.d-sm-none
             button.btn.btn-outline-warning(
                 (click)='sync(false)',
                 style={'margin-right':'10px'},
