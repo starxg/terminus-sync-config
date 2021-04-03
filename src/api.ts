@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-
 import axios, { AxiosResponse } from "axios";
 
 function resolveGist(response: AxiosResponse): any {
