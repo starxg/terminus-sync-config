@@ -1,0 +1,51 @@
+h3 Sync Config
+
+.row
+    .col-md-7
+        .form-group
+            label Type
+            select.form-control(
+                [(ngModel)]='config.store.syncConfig.type',
+                (ngModelChange)='config.save()'
+            )
+                option(ngValue='Off') Off
+                option(ngValue='GitHub') GitHub
+                option(ngValue='Gitee') Gitee
+
+.row(*ngIf='config.store.syncConfig.type !== "Off"')
+    .col-md-7
+        .form-group
+            label Token
+            input.form-control(
+                type='text', 
+                placeholder="token",
+                [(ngModel)]='config.store.syncConfig.token', 
+                (ngModelChange)='config.save()',
+            )
+        .form-group
+            label Gist
+            input.form-control(
+                type='text', 
+                placeholder="use existing gist id or automatic generation gist id",
+                [(ngModel)]='config.store.syncConfig.gist', 
+                (ngModelChange)='config.save()',
+            )
+        .form-group
+            button.btn.btn-outline-primary.mr-3(
+                (click)='sync(true)',
+                [disabled]='isUploading || isDownloading',
+            )
+                div.fa.fa-fw.fa-upload(*ngIf='!isUploading')
+                div.fa.fa-cog.fa-spin(*ngIf='isUploading')
+                span.ml-2 Upload config
+            button.btn.btn-outline-warning(
+                (click)='sync(false)',
+                style={'margin-right':'10px'},
+                [disabled]='isUploading || isDownloading',
+            ) 
+                div.fa.fa-cog.fa-spin(*ngIf='isDownloading')
+                div.fa.fa-fw.fa-download(*ngIf='!isDownloading')
+                span.ml-2 Download config
+        .form-group
+            p.text-white(*ngIf='isUploading || isDownloading') Syncing
+            p.text-white(*ngIf='!(isUploading || isDownloading)') Last sync time : {{ config.store.syncConfig.lastSyncTime }}
