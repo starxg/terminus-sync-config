@@ -1,6 +1,6 @@
 {
   "name": "terminus-sync-config",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Sync configuration files to GitHub Gist or Gitee Gist",
   "keywords": [
     "terminus-plugin"
@@ -8,7 +8,7 @@
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "scripts": {
-    "build": "webpack --progress --color",
+    "build": "webpack --progress --color --mode=production",
     "watch": "webpack --progress --color --watch",
     "prepublishOnly": "npm run build"
   },
@@ -34,7 +34,6 @@
     "pug": "^2.0.3",
     "pug-loader": "^2.4.0",
     "rxjs": "^6.2.1",
-    "sanitize-filename": "^1.6.3",
     "sass-loader": "^11.0.1",
     "strip-ansi": "^5.0.0",
     "style-loader": "^2.0.0",

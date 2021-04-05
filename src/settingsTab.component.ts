@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { Component, OnInit } from '@angular/core'
-import { ConfigService, } from 'terminus-core'
+import { ConfigService, ElectronService, } from 'terminus-core'
 import { ToastrService } from 'ngx-toastr'
 import { getGist, syncGist } from 'api';
 
@@ -15,6 +14,7 @@ export class SyncConfigSettingsTabComponent implements OnInit {
     constructor(
         public config: ConfigService,
         private toastr: ToastrService,
+        private electron: ElectronService,
     ) {
     }
 
@@ -82,6 +82,13 @@ export class SyncConfigSettingsTabComponent implements OnInit {
             if (isUploading) this.isUploading = false;
             else this.isDownloading = false;
             this.config.save();
+        }
+
+    }
+
+    viewGist(type: string, gist: string): void {
+        if (type === 'GitHub') {
+            this.electron.shell.openExternal('https://gist.github.com/' + gist)
         }
 
     }
