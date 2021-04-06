@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core'
 import { ConfigService, ElectronService, } from 'terminus-core'
 import { ToastrService } from 'ngx-toastr'
 import { getGist, syncGist } from 'api';
+import { PasswordStorageService } from 'services/PasswordStorage.service';
+
 
 /** @hidden */
 @Component({
@@ -15,10 +17,30 @@ export class SyncConfigSettingsTabComponent implements OnInit {
         public config: ConfigService,
         private toastr: ToastrService,
         private electron: ElectronService,
+        private passwordStorage: PasswordStorageService,
     ) {
     }
 
     ngOnInit(): void {
+        // keytar.getPassword(`ssh@43.128.36.153:22`, 'root').then(d => {
+        //     console.log(d);
+        // }).catch(e => {
+        //     console.log(e);
+        // })
+
+        // keytar.setPassword(`ssh@43.128.36.153:22`, 'root', '123').then(d => {
+        //     console.log(d);
+        // }).catch(e => {
+        //     console.log(e);
+        // })
+        this.passwordStorage.loadPassword({
+            host: 'starxg.com',
+            port: 22,
+            user: 'root'
+        }).then(d => {
+            console.log(d);
+        })
+
     }
 
     private dateFormat(date: Date): any {
