@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
+import { Connection } from 'api';
 import * as keytar from 'keytar'
 
 
-function getKey(host, port) {
-    let key = `ssh@${host}`
-    if (port) {
-        key = `ssh@${host}:${port}`
+function getKey(conn: Connection) {
+    let key = `ssh@${conn.host}`
+    if (conn.port) {
+        key = `ssh@${conn.host}:${conn.port}`
     }
     return key;
 }
@@ -16,18 +17,16 @@ function getKey(host, port) {
 @Injectable({ providedIn: 'root' })
 export class PasswordStorageService {
 
-
-
-    async savePassword({ host, port, user, password }): Promise<void> {
-
-        return keytar.setPassword(getKey(host, port), user, password)
+    async savePassword(conn: Connection): Promise<void> {
+        return keytar.setPassword(getKey(conn), conn.user, conn.auth.password)
     }
 
-    async deletePassword({ host, port, user }): Promise<void> {
-        await keytar.deletePassword(getKey(host, port), user)
+    async deletePassword(conn: Connection): Promise<void> {
+        await keytar.deletePassword(getKey(conn), conn.user)
     }
 
-    async loadPassword({ host, port, user }): Promise<string | null> {
-        return keytar.getPassword(getKey(host, port), user)
+    async loadPassword(conn: Connection): Promise<string | null> {
+        return keytar.getPassword(getKey(conn), conn.user)
     }
+
 }

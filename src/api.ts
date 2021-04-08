@@ -1,19 +1,41 @@
 import axios, { AxiosResponse } from "axios";
 
-function resolveGist(response: AxiosResponse): any {
-    if (response.data.files["config.json"] && response.data.files["config.json"].content) {
-        return response.data.files["config.json"].content;
-    }
-    throw 'the config file is bad.';
+function resolveGist(response: AxiosResponse): Map<string, string> {
+
+    const files = response.data.files;
+
+    if (!files || Object.keys(files).length < 1) throw 'the config file is bad.';
+
+    const result = new Map<string, string>();
+
+    Reflect.ownKeys(files).forEach(e => {
+        const cnt = files[e].content;
+        if (cnt) {
+            result.set(e as string, cnt);
+        }
+    });
+
+    return result;
 }
 
-async function syncGitee(token: string, gist: string, config: string): Promise<string> {
+function toFiles(configs: Map<string, string>) {
+    const files = {};
+    for (const c of configs.keys()) {
+        files[c] = {
+            content: configs.get(c)
+        };
+    }
+
+    return files;
+}
+
+async function syncGitee(token: string, gist: string, configs: Map<string, string>): Promise<string> {
     const url = gist ? `https://gitee.com/api/v5/gists/${gist}` : "https://gitee.com/api/v5/gists";
+
+
     const data = {
         access_token: token,
-        files: {
-            "config.json": { content: config }
-        },
+        files: toFiles(configs),
         description: "sync terminus config",
         public: false,
         id: gist || ''
@@ -43,14 +65,12 @@ async function syncGitee(token: string, gist: string, config: string): Promise<s
 
 }
 
-async function syncGithub(token: string, gist: string, config: string): Promise<any> {
-
+async function syncGithub(token: string, gist: string, configs: Map<string, string>): Promise<any> {
 
     const url = gist ? `https://api.github.com/gists/${gist}` : "https://api.github.com/gists";
+
     const data = {
-        files: {
-            "config.json": { content: config }
-        },
+        files: toFiles(configs),
         description: "sync terminus config",
         public: false
     };
@@ -81,13 +101,13 @@ async function syncGithub(token: string, gist: string, config: string): Promise<
     });
 }
 
-export function syncGist(type: string, token: string, gist: string, config: string): Promise<string> {
+export function syncGist(type: string, token: string, gist: string, configs: Map<string, string>): Promise<string> {
     return new Promise(async (resolve, reject) => {
         try {
             if (type === 'Gitee') {
-                resolve(await syncGitee(token, gist, config));
+                resolve(await syncGitee(token, gist, configs));
             } else if (type === 'GitHub') {
-                resolve(await syncGithub(token, gist, config));
+                resolve(await syncGithub(token, gist, configs));
             } else {
                 throw "unknown the type " + type;
             }
@@ -97,7 +117,7 @@ export function syncGist(type: string, token: string, gist: string, config: stri
     });
 }
 
-export function getGist(type: string, token: string, gist: string): Promise<string> {
+export function getGist(type: string, token: string, gist: string): Promise<Map<string, string>> {
 
     const isGithub = type === 'GitHub';
     const url = isGithub ? `https://api.github.com/gists/${gist}` : `https://gitee.com/api/v5/gists/${gist}`;
@@ -130,4 +150,14 @@ export function getGist(type: string, token: string, gist: string): Promise<stri
             }
         }
     });
+}
+
+
+export class Connection {
+    host: string;
+    port?: number;
+    user: string;
+    auth?: {
+        password: string;
+    };
 }
