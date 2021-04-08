@@ -1,11 +1,13 @@
 import { Component, OnInit } from '@angular/core'
 import { ConfigService, ElectronService, } from 'terminus-core'
 import { ToastrService } from 'ngx-toastr'
-import { getGist, syncGist } from 'api';
+import { Connection, getGist, syncGist } from 'api';
+import { PasswordStorageService } from 'services/PasswordStorage.service';
+
 
 /** @hidden */
 @Component({
-    template: require('./settingsTab.component.pug'),
+    template: require('./SettingsTab.component.pug'),
 })
 export class SyncConfigSettingsTabComponent implements OnInit {
     private isUploading: boolean = false;
@@ -15,6 +17,7 @@ export class SyncConfigSettingsTabComponent implements OnInit {
         public config: ConfigService,
         private toastr: ToastrService,
         private electron: ElectronService,
+        private passwordStorage: PasswordStorageService,
     ) {
     }
 
@@ -64,18 +67,38 @@ export class SyncConfigSettingsTabComponent implements OnInit {
 
         try {
             if (isUploading) {
-                this.config.store.syncConfig.gist = await syncGist(type, token, gistId, this.config.readRaw());
+
+                const configs = new Map<string, string>();
+                // config file
+                configs.set('config.json', this.config.readRaw());
+                // ssh password
+                configs.set('ssh.auth.json', JSON.stringify(await this.getSSHPluginAllPasswordInfos()))
+                this.config.store.syncConfig.gist = await syncGist(type, token, gistId, configs);
+
             } else {
+
                 const result = await getGist(type, token, gistId);
-                this.config.writeRaw(result);
+
+                if (result.get('config.json')) {
+                    this.config.writeRaw(result.get('config.json'));
+                }
+
+                if (result.get('ssh.auth.json')) {
+                    await this.saveSSHPluginAllPasswordInfos(JSON.parse(result.get('ssh.auth.json')) as Connection[]);
+                }
+
+
                 if (this.config.store.syncConfig.gist !== gistId) {
                     this.config.store.syncConfig.gist = gistId;
                 }
             }
+
             this.toastr.info('Sync succeeded', null, {
                 timeOut: 1500
             });
+
             this.config.store.syncConfig.lastSyncTime = this.dateFormat(new Date);
+
         } catch (error) {
             this.toastr.error(error);
         } finally {
@@ -90,7 +113,51 @@ export class SyncConfigSettingsTabComponent implements OnInit {
         if (type === 'GitHub') {
             this.electron.shell.openExternal('https://gist.github.com/' + gist)
         }
+    }
 
+    async saveSSHPluginAllPasswordInfos(conns: Connection[]) {
+        if (conns.length < 1) return;
+
+        for (const conn of conns) {
+            try {
+                await this.passwordStorage.savePassword(conn);
+            } catch (error) {
+                console.error(conn, error);
+            }
+        }
+
+    }
+
+    getSSHPluginAllPasswordInfos(): Promise<Connection[]> {
+
+        return new Promise(async (resolve) => {
+
+            const connections = this.config.store.ssh.connections;
+            if (!(connections instanceof Array) || connections.length < 1) {
+                resolve([]);
+                return;
+            }
+
+            const infos = [];
+            for (const connect of connections) {
+                try {
+                    const { host, port, user } = connect;
+                    const pwd = await this.passwordStorage.loadPassword({ host, port, user });
+                    if (!pwd) continue;
+                    infos.push({
+                        host, port, user,
+                        auth: {
+                            password: pwd
+                        }
+                    });
+                } catch (error) {
+                    console.error(connect, error);
+                }
+            }
+
+            resolve(infos);
+
+        });
     }
 
 }
