@@ -35,7 +35,6 @@ module.exports = {
   },
   externals: [
     'keytar',
-    'axios',
     'fs',
     'ngx-toastr',
     /^rxjs/,
