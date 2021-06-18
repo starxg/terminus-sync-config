@@ -49,15 +49,9 @@ export class SyncConfigSettingsTabComponent implements OnInit {
         const type = this.config.store.syncConfig.type;
         const token = this.config.store.syncConfig.token;
         const gistId = this.config.store.syncConfig.gist;
-        const password = this.config.store.syncConfig.password;
 
         if (!token) {
             this.toastr.error("token is missing");
-            return;
-        }
-
-        if (!password) {
-            this.toastr.error("password is missing");
             return;
         }
 
@@ -77,7 +71,7 @@ export class SyncConfigSettingsTabComponent implements OnInit {
                 const configs = new Map<string, string>();
                 let config_json = yaml.load(this.config.readRaw())
                 //配置的加密密钥不上传
-                delete config_json.syncConfig.password;
+                delete config_json.syncConfig.token;
                 // config file
                 configs.set('config.json', yaml.dump(config_json));
                 // ssh password
@@ -90,8 +84,8 @@ export class SyncConfigSettingsTabComponent implements OnInit {
 
                 if (result.get('config.json')) {
                     let config_json = yaml.load(this.config.readRaw())
-                    //把当前本地保存的密码写回来
-                    config_json.syncConfig.password = this.config.store.syncConfig.password
+                    //把当前本地保存的token写回来
+                    config_json.syncConfig.token = this.config.store.syncConfig.token
                     this.config.writeRaw(yaml.dump(config_json));
                 }
 
@@ -134,7 +128,7 @@ export class SyncConfigSettingsTabComponent implements OnInit {
                 if(!conn.auth.encryptType || (conn.auth.encryptType && conn.auth.encryptType === 'NONE')){
                     await this.passwordStorage.savePassword(conn)
                 }else{
-                    await this.passwordStorage.savePassword(await this.connectionEnc.decryptConnection(conn,this.config.store.syncConfig.password));
+                    await this.passwordStorage.savePassword(await this.connectionEnc.decryptConnection(conn,this.config.store.syncConfig.token));
                 }
             } catch (error) {
                 console.error(conn, error);
@@ -173,7 +167,7 @@ export class SyncConfigSettingsTabComponent implements OnInit {
                                 password: pwd,
                                 encryptType:'AES'
                             }
-                        },this.config.store.syncConfig.password));
+                        },this.config.store.syncConfig.token));
                     }
                 } catch (error) {
                     console.error(connect, error);
