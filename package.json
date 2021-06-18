@@ -27,8 +27,11 @@
     "@types/webpack-env": "^1.16.0",
     "apply-loader": "^2.0.0",
     "awesome-typescript-loader": "^5.2.1",
+    "axios": "^0.21.1",
+    "clean-webpack-plugin": "^0.1.19",
     "css-loader": "^5.1.1",
     "electron": "^7.0.0",
+    "keytar": "^7.6.0",
     "ngx-toastr": "^8.8.0",
     "node-sass": "^5.0.0",
     "pug": "^2.0.3",
@@ -39,13 +42,12 @@
     "style-loader": "^2.0.0",
     "terminus-core": "^1.0.135-nightly.0",
     "terminus-settings": "^1.0.135-nightly.0",
-    "terminus-ssh": "^1.0.135-nightly.1",
     "terminus-terminal": "^1.0.135-nightly.0",
+    "to-string-loader": "^1.1.6",
     "typescript": "^4.2.3",
     "webpack": "^5.24.4",
     "webpack-cli": "^4.5.0",
-    "axios": "^0.21.1",
-    "keytar": "^7.6.0"
+    "winston": "^3.3.3"
   },
   "peerDependencies": {
     "@angular/core": "^4.0.1"
@@ -53,7 +55,6 @@
   "repository": "starxg/terminus-sync-config",
   "dependencies": {
     "crypto-js": "^4.0.0",
-    "js-yaml": "^4.1.0",
-    "winston": "^3.3.3"
+    "js-yaml": "^4.1.0"
   }
 }
