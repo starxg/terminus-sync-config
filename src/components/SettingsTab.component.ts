@@ -131,7 +131,7 @@ export class SyncConfigSettingsTabComponent implements OnInit {
         if (conns.length < 1) return;
         for (const conn of conns) {
             try {
-                if(this.config.store.syncConfig.encrypted==='0'){
+                if(!conn.auth.encryptType || (conn.auth.encryptType && conn.auth.encryptType === 'NONE')){
                     await this.passwordStorage.savePassword(conn)
                 }else{
                     await this.passwordStorage.savePassword(await this.connectionEnc.decryptConnection(conn,this.config.store.syncConfig.password));
@@ -162,7 +162,8 @@ export class SyncConfigSettingsTabComponent implements OnInit {
                         infos.push({
                             host, port, user,
                             auth: {
-                                password: pwd
+                                password: pwd,
+                                encryptType:'NONE'
                             }
                         });
                     }else{
@@ -170,6 +171,7 @@ export class SyncConfigSettingsTabComponent implements OnInit {
                             host, port, user,
                             auth: {
                                 password: pwd,
+                                encryptType:'AES'
                             }
                         },this.config.store.syncConfig.password));
                     }

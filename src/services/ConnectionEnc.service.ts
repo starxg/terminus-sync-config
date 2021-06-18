@@ -19,7 +19,8 @@ export class ConnectionEnc {
             port:encryptedPort,
             user:encryptedUser,
             auth: {
-                password: encryptedPwd
+                password: encryptedPwd,
+                encryptType: 'AES'
             }
         };
     }
@@ -35,7 +36,8 @@ export class ConnectionEnc {
             port:parseInt(decrypPort),
             user:decrypUser,
             auth: {
-                password: decrypPwd
+                password: decrypPwd,
+                encryptType: 'AES'
             }
         };
     }

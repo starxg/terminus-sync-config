@@ -159,5 +159,6 @@ export class Connection {
     user: string;
     auth?: {
         password: string,
+        encryptType: 'NONE' | 'AES',
     };
 }
