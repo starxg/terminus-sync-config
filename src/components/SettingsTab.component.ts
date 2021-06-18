@@ -3,8 +3,7 @@ import { ConfigService, ElectronService, } from 'terminus-core'
 import { ToastrService } from 'ngx-toastr'
 import { Connection, getGist, syncGist } from 'api';
 import { PasswordStorageService } from 'services/PasswordStorage.service';
-
-
+import { ConnectionEnc } from 'services/ConnectionEnc.service';
 /** @hidden */
 @Component({
     template: require('./SettingsTab.component.pug'),
@@ -18,6 +17,7 @@ export class SyncConfigSettingsTabComponent implements OnInit {
         private toastr: ToastrService,
         private electron: ElectronService,
         private passwordStorage: PasswordStorageService,
+        private connectionEnc: ConnectionEnc,
     ) {
     }
 
@@ -49,9 +49,15 @@ export class SyncConfigSettingsTabComponent implements OnInit {
         const type = this.config.store.syncConfig.type;
         const token = this.config.store.syncConfig.token;
         const gistId = this.config.store.syncConfig.gist;
+        const password = this.config.store.syncConfig.password;
 
         if (!token) {
             this.toastr.error("token is missing");
+            return;
+        }
+
+        if (!password) {
+            this.toastr.error("password is missing");
             return;
         }
 
@@ -66,11 +72,14 @@ export class SyncConfigSettingsTabComponent implements OnInit {
 
 
         try {
+            const yaml = require('js-yaml')
             if (isUploading) {
-
                 const configs = new Map<string, string>();
+                let config_json = yaml.load(this.config.readRaw())
+                //配置的加密密钥不上传
+                delete config_json.syncConfig.password;
                 // config file
-                configs.set('config.json', this.config.readRaw());
+                configs.set('config.json', yaml.dump(config_json));
                 // ssh password
                 configs.set('ssh.auth.json', JSON.stringify(await this.getSSHPluginAllPasswordInfos()))
                 this.config.store.syncConfig.gist = await syncGist(type, token, gistId, configs);
@@ -80,7 +89,10 @@ export class SyncConfigSettingsTabComponent implements OnInit {
                 const result = await getGist(type, token, gistId);
 
                 if (result.get('config.json')) {
-                    this.config.writeRaw(result.get('config.json'));
+                    let config_json = yaml.load(this.config.readRaw())
+                    //把当前本地保存的密码写回来
+                    config_json.syncConfig.password = this.config.store.syncConfig.password
+                    this.config.writeRaw(yaml.dump(config_json));
                 }
 
                 if (result.get('ssh.auth.json')) {
@@ -117,10 +129,9 @@ export class SyncConfigSettingsTabComponent implements OnInit {
 
     async saveSSHPluginAllPasswordInfos(conns: Connection[]) {
         if (conns.length < 1) return;
-
         for (const conn of conns) {
             try {
-                await this.passwordStorage.savePassword(conn);
+                await this.passwordStorage.savePassword(await this.connectionEnc.decryptConnection(conn,this.config.store.syncConfig.password));
             } catch (error) {
                 console.error(conn, error);
             }
@@ -129,7 +140,6 @@ export class SyncConfigSettingsTabComponent implements OnInit {
     }
 
     getSSHPluginAllPasswordInfos(): Promise<Connection[]> {
-
         return new Promise(async (resolve) => {
 
             const connections = this.config.store.ssh.connections;
@@ -144,12 +154,12 @@ export class SyncConfigSettingsTabComponent implements OnInit {
                     const { host, port, user } = connect;
                     const pwd = await this.passwordStorage.loadPassword({ host, port, user });
                     if (!pwd) continue;
-                    infos.push({
+                    infos.push(await this.connectionEnc.encConnection({
                         host, port, user,
                         auth: {
                             password: pwd
                         }
-                    });
+                    },this.config.store.syncConfig.password));
                 } catch (error) {
                     console.error(connect, error);
                 }

@@ -6,7 +6,8 @@ export class SyncConfigProvider extends ConfigProvider {
             type: 'Off',
             token: '',
             gist: '',
-            lastSyncTime: '-'
+            lastSyncTime: '-',
+            password:''
         }
     }
 }

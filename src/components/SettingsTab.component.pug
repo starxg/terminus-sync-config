@@ -22,6 +22,14 @@ h3 Sync Config
                 [(ngModel)]='config.store.syncConfig.token', 
                 (ngModelChange)='config.save()',
             )
+        .form-group
+            label Password
+            input.form-control(
+                type='text', 
+                placeholder="password just for encrypt gist content",
+                [(ngModel)]='config.store.syncConfig.password', 
+                (ngModelChange)='config.save()',
+            )
         .form-row
             .form-group.col-md-9
                 label Gist
