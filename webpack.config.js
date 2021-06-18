@@ -1,4 +1,5 @@
 const path = require('path')
+const CleanWebpackPlugin = require('clean-webpack-plugin')
 
 module.exports = {
   target: 'node',
@@ -27,8 +28,9 @@ module.exports = {
         }
       },
       {
-        test: /\.scss/,
-        use: ['style-loader', 'css-loader', 'sass-loader'],
+        test: /\.scss$/,
+        exclude: [/node_modules/, /\.global\.scss$/],
+        use: ['to-string-loader', 'style-loader', 'css-loader', 'sass-loader'],
       },
       { test: /\.pug$/, use: ['apply-loader', 'pug-loader'] },
     ]
@@ -41,5 +43,8 @@ module.exports = {
     /^@angular/,
     /^@ng-bootstrap/,
     /^terminus-/,
+  ],
+  plugins: [
+    new CleanWebpackPlugin(['dist'])
   ]
 }
