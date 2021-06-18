@@ -30,14 +30,6 @@ export class ConnectionEnc {
         let decrypPort  = await this.decryptStr(conn.port+"",key);
         let decrypUser  = await this.decryptStr(conn.user,key);
         let decrypPwd  = await this.decryptStr(conn.auth.password,key);
-        console.log({
-            host:decrypHost,
-            port:parseInt(decrypPort),
-            user:decrypUser,
-            auth: {
-                password: decrypPwd
-            }
-        })
         return {
             host:decrypHost,
             port:parseInt(decrypPort),

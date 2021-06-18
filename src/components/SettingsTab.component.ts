@@ -131,7 +131,11 @@ export class SyncConfigSettingsTabComponent implements OnInit {
         if (conns.length < 1) return;
         for (const conn of conns) {
             try {
-                await this.passwordStorage.savePassword(await this.connectionEnc.decryptConnection(conn,this.config.store.syncConfig.password));
+                if(this.config.store.syncConfig.encrypted==='0'){
+                    await this.passwordStorage.savePassword(conn)
+                }else{
+                    await this.passwordStorage.savePassword(await this.connectionEnc.decryptConnection(conn,this.config.store.syncConfig.password));
+                }
             } catch (error) {
                 console.error(conn, error);
             }
@@ -154,12 +158,21 @@ export class SyncConfigSettingsTabComponent implements OnInit {
                     const { host, port, user } = connect;
                     const pwd = await this.passwordStorage.loadPassword({ host, port, user });
                     if (!pwd) continue;
-                    infos.push(await this.connectionEnc.encConnection({
-                        host, port, user,
-                        auth: {
-                            password: pwd
-                        }
-                    },this.config.store.syncConfig.password));
+                    if(this.config.store.syncConfig.encrypted==='0'){
+                        infos.push({
+                            host, port, user,
+                            auth: {
+                                password: pwd
+                            }
+                        });
+                    }else{
+                        infos.push(await this.connectionEnc.encConnection({
+                            host, port, user,
+                            auth: {
+                                password: pwd,
+                            }
+                        },this.config.store.syncConfig.password));
+                    }
                 } catch (error) {
                     console.error(connect, error);
                 }

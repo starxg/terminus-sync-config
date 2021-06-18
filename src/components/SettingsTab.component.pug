@@ -23,6 +23,14 @@ h3 Sync Config
                 (ngModelChange)='config.save()',
             )
         .form-group
+            label encrypted
+            select.form-control(
+                [(ngModel)]='config.store.syncConfig.encrypted',
+                (ngModelChange)='config.save()'
+            )
+                option(ngValue='1') encrypted
+                option(ngValue='0') plain
+        .form-group(*ngIf='config.store.syncConfig.encrypted !== "0"')
             label Password
             input.form-control(
                 type='text', 
