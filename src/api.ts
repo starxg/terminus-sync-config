@@ -158,6 +158,7 @@ export class Connection {
     port?: number;
     user: string;
     auth?: {
-        password: string;
+        password: string,
+        encryptType: 'NONE' | 'AES',
     };
 }

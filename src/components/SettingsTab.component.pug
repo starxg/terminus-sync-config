@@ -22,6 +22,14 @@ h3 Sync Config
                 [(ngModel)]='config.store.syncConfig.token', 
                 (ngModelChange)='config.save()',
             )
+        .form-group
+            label encrypted
+            select.form-control(
+                [(ngModel)]='config.store.syncConfig.encrypted',
+                (ngModelChange)='config.save()'
+            )
+                option(ngValue='1') encrypted
+                option(ngValue='0') plain
         .form-row
             .form-group.col-md-9
                 label Gist
