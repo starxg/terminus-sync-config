@@ -4,9 +4,11 @@ import { ToastrService } from 'ngx-toastr'
 import { Connection, getGist, syncGist } from 'api';
 import { PasswordStorageService } from 'services/PasswordStorage.service';
 import { ConnectionEnc } from 'services/ConnectionEnc.service';
+
 /** @hidden */
 @Component({
     template: require('./SettingsTab.component.pug'),
+    styles: [require('./SettingsTab.component.scss')]
 })
 export class SyncConfigSettingsTabComponent implements OnInit {
     private isUploading: boolean = false;
@@ -115,9 +117,9 @@ export class SyncConfigSettingsTabComponent implements OnInit {
 
     }
 
-    viewGist(type: string, gist: string): void {
-        if (type === 'GitHub') {
-            this.electron.shell.openExternal('https://gist.github.com/' + gist)
+    viewGist(): void {
+        if (this.config.store.syncConfig.type === 'GitHub') {
+            this.electron.shell.openExternal('https://gist.github.com/' + this.config.store.syncConfig.gist)
         }
     }
 
@@ -125,10 +127,10 @@ export class SyncConfigSettingsTabComponent implements OnInit {
         if (conns.length < 1) return;
         for (const conn of conns) {
             try {
-                if(!conn.auth.encryptType || (conn.auth.encryptType && conn.auth.encryptType === 'NONE')){
+                if (!conn.auth.encryptType || (conn.auth.encryptType && conn.auth.encryptType === 'NONE')) {
                     await this.passwordStorage.savePassword(conn)
-                }else{
-                    await this.passwordStorage.savePassword(await this.connectionEnc.decryptConnection(conn,this.config.store.syncConfig.token));
+                } else {
+                    await this.passwordStorage.savePassword(await this.connectionEnc.decryptConnection(conn, this.config.store.syncConfig.token));
                 }
             } catch (error) {
                 console.error(conn, error);
@@ -152,22 +154,22 @@ export class SyncConfigSettingsTabComponent implements OnInit {
                     const { host, port, user } = connect;
                     const pwd = await this.passwordStorage.loadPassword({ host, port, user });
                     if (!pwd) continue;
-                    if(this.config.store.syncConfig.encrypted==='0'){
+                    if (this.config.store.syncConfig.encrypted === '0') {
                         infos.push({
                             host, port, user,
                             auth: {
                                 password: pwd,
-                                encryptType:'NONE'
+                                encryptType: 'NONE'
                             }
                         });
-                    }else{
+                    } else {
                         infos.push(await this.connectionEnc.encConnection({
                             host, port, user,
                             auth: {
                                 password: pwd,
-                                encryptType:'AES'
+                                encryptType: 'AES'
                             }
-                        },this.config.store.syncConfig.token));
+                        }, this.config.store.syncConfig.token));
                     }
                 } catch (error) {
                     console.error(connect, error);

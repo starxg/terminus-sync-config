@@ -7,6 +7,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { ConfigProvider } from 'terminus-core';
 import { SyncConfigProvider } from 'config';
 import { SyncConfigSettingsTabComponent } from 'components/settingsTab.component'
+import { ToggleComponent } from 'components/toggle.component'
 
 @NgModule({
     imports: [
@@ -22,7 +23,8 @@ import { SyncConfigSettingsTabComponent } from 'components/settingsTab.component
         SyncConfigSettingsTabComponent
     ],
     declarations: [
-        SyncConfigSettingsTabComponent
+        SyncConfigSettingsTabComponent,
+        ToggleComponent
     ],
 })
 
