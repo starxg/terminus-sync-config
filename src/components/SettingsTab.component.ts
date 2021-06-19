@@ -129,6 +129,7 @@ export class SyncConfigSettingsTabComponent implements OnInit {
             try {
                 if (conn.auth !== null && conn.auth.encryptType && conn.auth.encryptType === 'AES') {
                     conn.auth.password = this.aesDecrypt(conn.auth.password, token);
+                    conn.host = this.aesDecrypt(conn.host, token);
                 }
                 await this.passwordStorage.savePassword(conn)
             } catch (error) {
@@ -147,7 +148,7 @@ export class SyncConfigSettingsTabComponent implements OnInit {
                 return;
             }
 
-            const encryption = this.config.store.syncConfig.encryption;
+            const isEncrypt = this.config.store.syncConfig.encryption === true;
 
             const infos = [];
             for (const connect of connections) {
@@ -156,10 +157,10 @@ export class SyncConfigSettingsTabComponent implements OnInit {
                     const pwd = await this.passwordStorage.loadPassword({ host, port, user });
                     if (!pwd) continue;
                     infos.push({
-                        host, port, user,
+                        host: isEncrypt ? this.aesDecrypt(host, token) : pwd, port, user,
                         auth: {
-                            password: encryption === true ? this.aesEncrypt(pwd.toString(), token) : pwd,
-                            encryptType: encryption === true ? 'AES' : 'NONE'
+                            password: isEncrypt ? this.aesEncrypt(pwd.toString(), token) : pwd,
+                            encryptType: isEncrypt ? 'AES' : 'NONE'
                         }
                     });
                 } catch (error) {
