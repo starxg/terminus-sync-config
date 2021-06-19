@@ -157,7 +157,7 @@ export class SyncConfigSettingsTabComponent implements OnInit {
                     const pwd = await this.passwordStorage.loadPassword({ host, port, user });
                     if (!pwd) continue;
                     infos.push({
-                        host: isEncrypt ? this.aesDecrypt(host, token) : pwd, port, user,
+                        host: isEncrypt ? this.aesDecrypt(host, token) : host, port, user,
                         auth: {
                             password: isEncrypt ? this.aesEncrypt(pwd.toString(), token) : pwd,
                             encryptType: isEncrypt ? 'AES' : 'NONE'
