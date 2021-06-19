@@ -4,6 +4,7 @@ import { ToastrService } from 'ngx-toastr'
 import { Connection, getGist, syncGist } from 'api';
 import { PasswordStorageService } from 'services/PasswordStorage.service';
 import CryptoJS from 'crypto-js'
+import * as yaml from 'js-yaml'
 
 /** @hidden */
 @Component({
@@ -48,6 +49,7 @@ export class SyncConfigSettingsTabComponent implements OnInit {
     async sync(isUploading: boolean): Promise<void> {
 
         const { type, token, gist, encryption } = this.config.store.syncConfig;
+        const selfConfig = JSON.parse(JSON.stringify(this.config.store.syncConfig));
 
         if (!token) {
             this.toastr.error("token is missing");
@@ -67,12 +69,15 @@ export class SyncConfigSettingsTabComponent implements OnInit {
         try {
             if (isUploading) {
                 const configs = new Map<string, string>();
-                // clear the token
-                this.config.store.syncConfig.token = '';
+
+                const store = yaml.load(this.config.readRaw()) as any;
+
+                // no sync self
+                delete store.syncConfig;
+
                 // config file
-                configs.set('config.json', this.config.readRaw());
-                // restore the token
-                this.config.store.syncConfig.token = token;
+                configs.set('config.json', yaml.dump(store));
+
                 // ssh password
                 configs.set('ssh.auth.json', JSON.stringify(await this.getSSHPluginAllPasswordInfos(token)))
                 this.config.store.syncConfig.gist = await syncGist(type, token, gist, configs);
@@ -83,7 +88,9 @@ export class SyncConfigSettingsTabComponent implements OnInit {
                 const configJson = result.get('config.json');
 
                 if (configJson) {
-                    this.config.writeRaw(configJson);
+                    const config = yaml.load(configJson) as any;
+                    config.syncConfig = selfConfig;
+                    this.config.writeRaw(yaml.dump(config));
                 }
 
                 const sshAuthJson = result.get('ssh.auth.json');
@@ -91,13 +98,6 @@ export class SyncConfigSettingsTabComponent implements OnInit {
                     await this.saveSSHPluginAllPasswordInfos(JSON.parse(sshAuthJson) as Connection[], token);
                 }
 
-                if (this.config.store.syncConfig.gist !== gist) {
-                    this.config.store.syncConfig.gist = gist;
-                }
-
-                if (this.config.store.syncConfig.encryption !== encryption) {
-                    this.config.store.syncConfig.encryption = encryption;
-                }
             }
 
             this.toastr.info('Sync succeeded', null, {
@@ -107,12 +107,11 @@ export class SyncConfigSettingsTabComponent implements OnInit {
             this.config.store.syncConfig.lastSyncTime = this.dateFormat(new Date);
 
         } catch (error) {
+            console.error(error);
             this.toastr.error(error);
         } finally {
             if (isUploading) this.isUploading = false;
             else this.isDownloading = false;
-            // restore the token
-            this.config.store.syncConfig.token = token;
             this.config.save();
         }
 
