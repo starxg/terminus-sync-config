@@ -30,7 +30,7 @@ div.sync-config-settings-tab
                     .title Enctyption
                     .description Use token to encrypt SSH passwords
                 toggle(
-                    [(ngModel)]='config.store.syncConfig.encrypt',
+                    [(ngModel)]='config.store.syncConfig.encryption',
                     (ngModelChange)='config.save()',
                 )
             .form-line

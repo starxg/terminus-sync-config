@@ -54,7 +54,6 @@
   },
   "repository": "starxg/terminus-sync-config",
   "dependencies": {
-    "crypto-js": "^4.0.0",
-    "js-yaml": "^4.1.0"
+    "crypto-js": "^4.0.0"
   }
 }

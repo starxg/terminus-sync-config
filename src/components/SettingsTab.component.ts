@@ -3,7 +3,7 @@ import { ConfigService, ElectronService, } from 'terminus-core'
 import { ToastrService } from 'ngx-toastr'
 import { Connection, getGist, syncGist } from 'api';
 import { PasswordStorageService } from 'services/PasswordStorage.service';
-import { ConnectionEnc } from 'services/ConnectionEnc.service';
+import CryptoJS from 'crypto-js'
 
 /** @hidden */
 @Component({
@@ -18,8 +18,7 @@ export class SyncConfigSettingsTabComponent implements OnInit {
         public config: ConfigService,
         private toastr: ToastrService,
         private electron: ElectronService,
-        private passwordStorage: PasswordStorageService,
-        private connectionEnc: ConnectionEnc,
+        private passwordStorage: PasswordStorageService
     ) {
     }
 
@@ -48,9 +47,7 @@ export class SyncConfigSettingsTabComponent implements OnInit {
 
     async sync(isUploading: boolean): Promise<void> {
 
-        const type = this.config.store.syncConfig.type;
-        const token = this.config.store.syncConfig.token;
-        const gistId = this.config.store.syncConfig.gist;
+        const { type, token, gist, encryption } = this.config.store.syncConfig;
 
         if (!token) {
             this.toastr.error("token is missing");
@@ -59,7 +56,7 @@ export class SyncConfigSettingsTabComponent implements OnInit {
 
         if (isUploading) this.isUploading = true;
         else {
-            if (!gistId) {
+            if (!gist) {
                 this.toastr.error("gist id is missing");
                 return;
             }
@@ -68,36 +65,38 @@ export class SyncConfigSettingsTabComponent implements OnInit {
 
 
         try {
-            const yaml = require('js-yaml')
             if (isUploading) {
                 const configs = new Map<string, string>();
-                let config_json = yaml.load(this.config.readRaw())
-                //配置的加密密钥不上传
-                delete config_json.syncConfig.token;
+                // clear the token
+                this.config.store.syncConfig.token = '';
                 // config file
-                configs.set('config.json', yaml.dump(config_json));
+                configs.set('config.json', this.config.readRaw());
+                // restore the token
+                this.config.store.syncConfig.token = token;
                 // ssh password
-                configs.set('ssh.auth.json', JSON.stringify(await this.getSSHPluginAllPasswordInfos()))
-                this.config.store.syncConfig.gist = await syncGist(type, token, gistId, configs);
+                configs.set('ssh.auth.json', JSON.stringify(await this.getSSHPluginAllPasswordInfos(token)))
+                this.config.store.syncConfig.gist = await syncGist(type, token, gist, configs);
 
             } else {
 
-                const result = await getGist(type, token, gistId);
+                const result = await getGist(type, token, gist);
+                const configJson = result.get('config.json');
 
-                if (result.get('config.json')) {
-                    let config_json = yaml.load(this.config.readRaw())
-                    //把当前本地保存的token写回来
-                    config_json.syncConfig.token = this.config.store.syncConfig.token
-                    this.config.writeRaw(yaml.dump(config_json));
+                if (configJson) {
+                    this.config.writeRaw(configJson);
                 }
 
-                if (result.get('ssh.auth.json')) {
-                    await this.saveSSHPluginAllPasswordInfos(JSON.parse(result.get('ssh.auth.json')) as Connection[]);
+                const sshAuthJson = result.get('ssh.auth.json');
+                if (sshAuthJson) {
+                    await this.saveSSHPluginAllPasswordInfos(JSON.parse(sshAuthJson) as Connection[], token);
                 }
 
+                if (this.config.store.syncConfig.gist !== gist) {
+                    this.config.store.syncConfig.gist = gist;
+                }
 
-                if (this.config.store.syncConfig.gist !== gistId) {
-                    this.config.store.syncConfig.gist = gistId;
+                if (this.config.store.syncConfig.encryption !== encryption) {
+                    this.config.store.syncConfig.encryption = encryption;
                 }
             }
 
@@ -112,6 +111,8 @@ export class SyncConfigSettingsTabComponent implements OnInit {
         } finally {
             if (isUploading) this.isUploading = false;
             else this.isDownloading = false;
+            // restore the token
+            this.config.store.syncConfig.token = token;
             this.config.save();
         }
 
@@ -123,15 +124,14 @@ export class SyncConfigSettingsTabComponent implements OnInit {
         }
     }
 
-    async saveSSHPluginAllPasswordInfos(conns: Connection[]) {
+    async saveSSHPluginAllPasswordInfos(conns: Connection[], token: string) {
         if (conns.length < 1) return;
         for (const conn of conns) {
             try {
-                if (!conn.auth.encryptType || (conn.auth.encryptType && conn.auth.encryptType === 'NONE')) {
-                    await this.passwordStorage.savePassword(conn)
-                } else {
-                    await this.passwordStorage.savePassword(await this.connectionEnc.decryptConnection(conn, this.config.store.syncConfig.token));
+                if (conn.auth !== null && conn.auth.encryptType && conn.auth.encryptType === 'AES') {
+                    conn.auth.password = this.aesDecrypt(conn.auth.password, token);
                 }
+                await this.passwordStorage.savePassword(conn)
             } catch (error) {
                 console.error(conn, error);
             }
@@ -139,7 +139,7 @@ export class SyncConfigSettingsTabComponent implements OnInit {
 
     }
 
-    getSSHPluginAllPasswordInfos(): Promise<Connection[]> {
+    getSSHPluginAllPasswordInfos(token: string): Promise<Connection[]> {
         return new Promise(async (resolve) => {
 
             const connections = this.config.store.ssh.connections;
@@ -148,29 +148,21 @@ export class SyncConfigSettingsTabComponent implements OnInit {
                 return;
             }
 
+            const encryption = this.config.store.syncConfig.encryption;
+
             const infos = [];
             for (const connect of connections) {
                 try {
                     const { host, port, user } = connect;
                     const pwd = await this.passwordStorage.loadPassword({ host, port, user });
                     if (!pwd) continue;
-                    if (this.config.store.syncConfig.encrypted === '0') {
-                        infos.push({
-                            host, port, user,
-                            auth: {
-                                password: pwd,
-                                encryptType: 'NONE'
-                            }
-                        });
-                    } else {
-                        infos.push(await this.connectionEnc.encConnection({
-                            host, port, user,
-                            auth: {
-                                password: pwd,
-                                encryptType: 'AES'
-                            }
-                        }, this.config.store.syncConfig.token));
-                    }
+                    infos.push({
+                        host, port, user,
+                        auth: {
+                            password: encryption === true ? this.aesEncrypt(pwd.toString(), token) : pwd,
+                            encryptType: encryption === true ? 'AES' : 'NONE'
+                        }
+                    });
                 } catch (error) {
                     console.error(connect, error);
                 }
@@ -179,6 +171,37 @@ export class SyncConfigSettingsTabComponent implements OnInit {
             resolve(infos);
 
         });
+
+
     }
 
+    /* AES Begin http://www.kt5.cn/fe/2019/12/12/cryptojs-aes-128-bit-ecrypt-decrypt/ */
+
+    aesEncrypt(str: string, token: string) {
+        const k = this.getEncKey(token);
+        const formatedKey = CryptoJS.enc.Utf8.parse(k)
+        const formatedIv = CryptoJS.enc.Utf8.parse(k)
+        const encrypted = CryptoJS.AES.encrypt(str, formatedKey, { iv: formatedIv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 })
+        return encrypted.ciphertext.toString()
+    }
+
+    aesDecrypt(encryptedStr: string, token: string) {
+        const encryptedHexStr = CryptoJS.enc.Hex.parse(encryptedStr)
+        const encryptedBase64Str = CryptoJS.enc.Base64.stringify(encryptedHexStr)
+        const k = this.getEncKey(token);
+        const formatedKey = CryptoJS.enc.Utf8.parse(k)
+        const formatedIv = CryptoJS.enc.Utf8.parse(k)
+        const decryptedData = CryptoJS.AES.decrypt(encryptedBase64Str, formatedKey, { iv: formatedIv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 })
+        return decryptedData.toString(CryptoJS.enc.Utf8)
+    }
+
+    getEncKey(token: string): string {
+        const diff = 16 - token.length;
+        if (diff < 0) {
+            return token.substr(0, 16);
+        }
+        return token + Array(diff + 1).join('0');
+    }
+
+    /* AES End */
 }
