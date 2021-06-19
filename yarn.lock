@@ -122,6 +122,11 @@
   resolved "https://registry.npm.taobao.org/@types/estree/download/@types/estree-0.0.46.tgz#0fb6bfbbeabd7a30880504993369c4bf1deab1fe"
   integrity sha1-D7a/u+q9ejCIBQSZM2nEvx3qsf4=
 
+"@types/js-yaml@^4.0.0":
+  version "4.0.1"
+  resolved "https://registry.nlark.com/@types/js-yaml/download/@types/js-yaml-4.0.1.tgz#5544730b65a480b18ace6b6ce914e519cec2d43b"
+  integrity sha1-VURzC2WkgLGKzmts6RTlGc7C1Ds=
+
 "@types/json-schema@*", "@types/json-schema@^7.0.6":
   version "7.0.7"
   resolved "https://registry.npm.taobao.org/@types/json-schema/download/@types/json-schema-7.0.7.tgz?cache=0&sync_timestamp=1613378919536&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Fjson-schema%2Fdownload%2F%40types%2Fjson-schema-7.0.7.tgz#98a993516c859eb0d5c4c8f098317a9ea68db9ad"
@@ -397,6 +402,11 @@ are-we-there-yet@~1.1.2:
   dependencies:
     delegates "^1.0.0"
     readable-stream "^2.0.6"
+
+argparse@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.nlark.com/argparse/download/argparse-2.0.1.tgz#246f50f3ca78a3240f6c997e8a9bd1eac49e4b38"
+  integrity sha1-JG9Q88p4oyQPbJl+ipvR6sSeSzg=
 
 arr-diff@^4.0.0:
   version "4.0.0"
@@ -2030,6 +2040,13 @@ js-stringify@^1.0.1:
   version "1.0.2"
   resolved "https://registry.npm.taobao.org/js-stringify/download/js-stringify-1.0.2.tgz#1736fddfd9724f28a3682adc6230ae7e4e9679db"
   integrity sha1-Fzb939lyTyijaCrcYjCufk6Weds=
+
+js-yaml@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.nlark.com/js-yaml/download/js-yaml-4.1.0.tgz?cache=0&sync_timestamp=1618846844115&other_urls=https%3A%2F%2Fregistry.nlark.com%2Fjs-yaml%2Fdownload%2Fjs-yaml-4.1.0.tgz#c1fb65f8f5017901cdd2c951864ba18458a10602"
+  integrity sha1-wftl+PUBeQHN0slRhkuhhFihBgI=
+  dependencies:
+    argparse "^2.0.1"
 
 jsbn@~0.1.0:
   version "0.1.1"

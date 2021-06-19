@@ -10,7 +10,7 @@
   "scripts": {
     "build": "webpack --progress --color --mode=production",
     "watch": "webpack --progress --color --watch",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build --mode=production"
   },
   "files": [
     "dist"
@@ -24,6 +24,7 @@
     "@angular/forms": "^7.2.8",
     "@angular/platform-browser": "^7.2.8",
     "@ng-bootstrap/ng-bootstrap": "^2.2.0",
+    "@types/js-yaml": "^4.0.0",
     "@types/webpack-env": "^1.16.0",
     "apply-loader": "^2.0.0",
     "awesome-typescript-loader": "^5.2.1",
@@ -31,6 +32,7 @@
     "clean-webpack-plugin": "^0.1.19",
     "css-loader": "^5.1.1",
     "electron": "^7.0.0",
+    "js-yaml": "^4.1.0",
     "keytar": "^7.6.0",
     "ngx-toastr": "^8.8.0",
     "node-sass": "^5.0.0",
