@@ -129,7 +129,6 @@ export class SyncConfigSettingsTabComponent implements OnInit {
             try {
                 if (conn.auth !== null && conn.auth.encryptType && conn.auth.encryptType === 'AES') {
                     conn.auth.password = this.aesDecrypt(conn.auth.password, token);
-                    conn.host = this.aesDecrypt(conn.host, token);
                 }
                 await this.passwordStorage.savePassword(conn)
             } catch (error) {
