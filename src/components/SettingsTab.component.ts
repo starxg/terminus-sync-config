@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core'
-import { ConfigService, ElectronService, } from 'terminus-core'
+import { ConfigService, PlatformService } from 'terminus-core'
 import { ToastrService } from 'ngx-toastr'
 import { Connection, getGist, syncGist } from 'api';
 import { PasswordStorageService } from 'services/PasswordStorage.service';
@@ -18,7 +18,7 @@ export class SyncConfigSettingsTabComponent implements OnInit {
     constructor(
         public config: ConfigService,
         private toastr: ToastrService,
-        private electron: ElectronService,
+        private platform: PlatformService,
         private passwordStorage: PasswordStorageService
     ) {
     }
@@ -119,7 +119,7 @@ export class SyncConfigSettingsTabComponent implements OnInit {
 
     viewGist(): void {
         if (this.config.store.syncConfig.type === 'GitHub') {
-            this.electron.shell.openExternal('https://gist.github.com/' + this.config.store.syncConfig.gist)
+            this.platform.openExternal('https://gist.github.com/' + this.config.store.syncConfig.gist)
         }
     }
 

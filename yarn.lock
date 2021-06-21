@@ -1771,6 +1771,11 @@ hosted-git-info@^2.1.4:
   resolved "https://registry.npm.taobao.org/hosted-git-info/download/hosted-git-info-2.8.8.tgz#7539bd4bc1e0e0a895815a2e0262420b12858488"
   integrity sha1-dTm9S8Hg4KiVgVouAmJCCxKFhIg=
 
+hterm-umdjs@1.4.1:
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/hterm-umdjs/-/hterm-umdjs-1.4.1.tgz#0cd5352eaf927c70b83c36146cf2c2a281dba957"
+  integrity sha512-r5JOmdDK1bZCmp3cKcuGRLVeum33H+pzD119ZxmQou+QUVe6SAVSz03HvKWVhM2Ao1Biv+fkhFDmnsaRPq0tFg==
+
 http-cache-semantics@^4.0.0:
   version "4.1.0"
   resolved "https://registry.npm.taobao.org/http-cache-semantics/download/http-cache-semantics-4.1.0.tgz#49e91c5cbf36c9b94bcfcd71c23d5249ec74e390"
@@ -2676,6 +2681,14 @@ onetime@^5.1.2:
   integrity sha1-0Oluu1awdHbfHdnEgG5SN5hcpF4=
   dependencies:
     mimic-fn "^2.1.0"
+
+opentype.js@^1.3.3:
+  version "1.3.3"
+  resolved "https://registry.yarnpkg.com/opentype.js/-/opentype.js-1.3.3.tgz#65b8645b090a1ad444065b784d442fa19d1061f6"
+  integrity sha512-/qIY/+WnKGlPIIPhbeNjynfD2PO15G9lA/xqlX2bDH+4lc3Xz5GCQ68mqxj3DdUv6AJqCeaPvuAoH8mVL0zcuA==
+  dependencies:
+    string.prototype.codepointat "^0.2.1"
+    tiny-inflate "^1.0.3"
 
 p-cancelable@^1.0.0:
   version "1.1.0"
@@ -3600,6 +3613,11 @@ string-width@^3.0.0, string-width@^3.1.0:
     is-fullwidth-code-point "^2.0.0"
     strip-ansi "^5.1.0"
 
+string.prototype.codepointat@^0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/string.prototype.codepointat/-/string.prototype.codepointat-0.2.1.tgz#004ad44c8afc727527b108cd462b4d971cd469bc"
+  integrity sha512-2cBVCj6I4IOvEnjgO/hWqXjqBGsY+zwPmHl12Srk9IXSZ56Jwwmy+66XO5Iut/oQVR7t5ihYdLB0GMa4alEUcg==
+
 string_decoder@^1.1.1:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/string_decoder/-/string_decoder-1.3.0.tgz#42f114594a46cf1a8e30b0a84f56c78c3edac21e"
@@ -3736,20 +3754,23 @@ tar@^6.0.2:
     mkdirp "^1.0.3"
     yallist "^4.0.0"
 
-terminus-core@^1.0.135-nightly.0:
-  version "1.0.135-nightly.0"
-  resolved "https://registry.npm.taobao.org/terminus-core/download/terminus-core-1.0.135-nightly.0.tgz#ef4622588f9295dbb8818b1a3314d8e6fdd575c1"
-  integrity sha1-70YiWI+Sldu4gYsaMxTY5v3VdcE=
+terminus-core@^1.0.140:
+  version "1.0.140"
+  resolved "https://registry.yarnpkg.com/terminus-core/-/terminus-core-1.0.140.tgz#4f1c8f5cdbf6c47bd659407d5f69ae783139d6dd"
+  integrity sha512-Q5A2G8B+Bro2V8b6dL7rfvlpB6F4kLzVlIDxHF5k/7LZzz7PvmKGCJeFO1DbukD5Nh9ORdNaTFUcuAispYOr1Q==
 
-terminus-settings@^1.0.135-nightly.0:
-  version "1.0.135-nightly.0"
-  resolved "https://registry.npm.taobao.org/terminus-settings/download/terminus-settings-1.0.135-nightly.0.tgz#5b14b42a23ea95106d42cbff4a33272d9b360295"
-  integrity sha1-WxS0KiPqlRBtQsv/SjMnLZs2ApU=
+terminus-settings@^1.0.140:
+  version "1.0.140"
+  resolved "https://registry.yarnpkg.com/terminus-settings/-/terminus-settings-1.0.140.tgz#ef44e1abce9d8de86b14f9e460b47300e97924cb"
+  integrity sha512-+rxoZ9ecaksrVn+4OAGDEJZv7kttRHsPwbsxp+yRodeNs0AFiN6eNyf6M8zikbE8ppPCkNNMTLW6oXvF5dywHQ==
 
-terminus-terminal@^1.0.135-nightly.0:
-  version "1.0.135-nightly.0"
-  resolved "https://registry.npm.taobao.org/terminus-terminal/download/terminus-terminal-1.0.135-nightly.0.tgz#a55a741f022b7039be2ae0bd53310e8ed6308576"
-  integrity sha1-pVp0HwIrcDm+KuC9UzEOjtYwhXY=
+terminus-terminal@^1.0.140:
+  version "1.0.140"
+  resolved "https://registry.yarnpkg.com/terminus-terminal/-/terminus-terminal-1.0.140.tgz#eb19fae27357760a6aa5ded5c5e4edbb6deb726d"
+  integrity sha512-fk5Ee/+AFOWwlezHjls53bneKEhWKi/ceLxC1U72piZoeoql2d4eO/+t1Kl+3XB70PCiIMb4aKZGn5y+p107aw==
+  dependencies:
+    hterm-umdjs "1.4.1"
+    opentype.js "^1.3.3"
 
 terser-webpack-plugin@^5.1.1:
   version "5.1.1"
@@ -3776,6 +3797,11 @@ text-hex@1.0.x:
   version "1.0.0"
   resolved "https://registry.npm.taobao.org/text-hex/download/text-hex-1.0.0.tgz#69dc9c1b17446ee79a92bf5b884bb4b9127506f5"
   integrity sha1-adycGxdEbueakr9biEu0uRJ1BvU=
+
+tiny-inflate@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/tiny-inflate/-/tiny-inflate-1.0.3.tgz#122715494913a1805166aaf7c93467933eea26c4"
+  integrity sha512-pkY1fj1cKHb2seWDy0B16HeWyczlJA9/WW3u3c4z/NiWDsO3DOU5D7nhTLE9CF0yXv/QZFY7sEJmj24dK+Rrqw==
 
 to-fast-properties@^1.0.3:
   version "1.0.3"
