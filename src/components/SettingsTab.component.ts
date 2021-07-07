@@ -5,6 +5,7 @@ import { Connection, getGist, syncGist } from 'api';
 import { PasswordStorageService } from 'services/PasswordStorage.service';
 import CryptoJS from 'crypto-js'
 import * as yaml from 'js-yaml'
+import { GistFile } from 'gist/Gist';
 
 /** @hidden */
 @Component({
@@ -68,7 +69,7 @@ export class SyncConfigSettingsTabComponent implements OnInit {
 
         try {
             if (isUploading) {
-                const configs = new Map<string, string>();
+                const files = [];
 
                 const store = yaml.load(this.config.readRaw()) as any;
 
@@ -76,26 +77,25 @@ export class SyncConfigSettingsTabComponent implements OnInit {
                 delete store.syncConfig;
 
                 // config file
-                configs.set('config.json', yaml.dump(store));
+                files.push(new GistFile('config.json', yaml.dump(store)));
 
                 // ssh password
-                configs.set('ssh.auth.json', JSON.stringify(await this.getSSHPluginAllPasswordInfos(token)))
-                this.config.store.syncConfig.gist = await syncGist(type, token, gist, configs);
+                files.push(new GistFile('ssh.auth.json', JSON.stringify(await this.getSSHPluginAllPasswordInfos(token))));
+
+                this.config.store.syncConfig.gist = await syncGist(type, token, gist, files);
 
             } else {
 
                 const result = await getGist(type, token, gist);
-                const configJson = result.get('config.json');
 
-                if (configJson) {
-                    const config = yaml.load(configJson) as any;
+                if (result.has('config.json')) {
+                    const config = yaml.load(result.get('config.json').value) as any;
                     config.syncConfig = selfConfig;
                     this.config.writeRaw(yaml.dump(config));
                 }
 
-                const sshAuthJson = result.get('ssh.auth.json');
-                if (sshAuthJson) {
-                    await this.saveSSHPluginAllPasswordInfos(JSON.parse(sshAuthJson) as Connection[], token);
+                if (result.has('ssh.auth.json')) {
+                    await this.saveSSHPluginAllPasswordInfos(JSON.parse(result.get('ssh.auth.json').value) as Connection[], token);
                 }
 
             }
