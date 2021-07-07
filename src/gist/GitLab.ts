@@ -25,7 +25,13 @@ class GitLab extends Gist {
         const data = {
             title: "sync terminus config",
             visibility: "private",
-            files: gists.map(e => { return { file_path: e.name, content: e.value } })
+            files: gists.map(e => {
+                let obj: any = { file_path: e.name, content: e.value };
+                if (gist) {
+                    obj.action = 'update';
+                }
+                return obj
+            })
         };
 
         const url = gist ? `${this.baseUrl}/${gist}` : this.baseUrl;
@@ -66,9 +72,14 @@ class GitLab extends Gist {
                 url: `${this.baseUrl}/${gist}/files/main/${path}/raw`,
                 headers: {
                     Authorization: `Bearer ${this.token}`
-                }
+                },
+                responseType: 'text'
             }).then(res => {
-                resolve(res.data);
+                if (typeof res.data === 'object') {
+                    resolve(JSON.stringify(res.data));
+                } else {
+                    resolve(res.data);
+                }
             }).catch(reject);
         });
     }

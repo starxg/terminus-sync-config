@@ -9,7 +9,7 @@ class GitHub extends Gist {
 
         return new Promise(async (resolve, reject) => {
             this.request({
-                method: 'PATCH',
+                method: 'GET',
                 url,
                 headers: {
                     Authorization: `Bearer ${this.token}`

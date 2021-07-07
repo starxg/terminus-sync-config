@@ -13,6 +13,7 @@ div.sync-config-settings-tab
                     option(ngValue='Off') Off
                     option(ngValue='GitHub') GitHub
                     option(ngValue='Gitee') Gitee
+                    option(ngValue='GitLab') GitLab
 
     .row(*ngIf='config.store.syncConfig.type !== "Off"')
         .col-md-7
@@ -43,10 +44,10 @@ div.sync-config-settings-tab
                             [(ngModel)]='config.store.syncConfig.gist', 
                             (ngModelChange)='config.save()',
                     )
-                    .input-group-append(*ngIf='config.store.syncConfig.type === "GitHub"')
+                    .input-group-append(*ngIf='config.store.syncConfig.type !== "Gitee"')
                         button.btn.btn-secondary(
                             (click)='viewGist()',
-                            [disabled]="config.store.syncConfig.gist === null || config.store.syncConfig.gist.trim() === ''",
+                            [disabled]="config.store.syncConfig.gist === null || config.store.syncConfig.gist.toString().trim() === ''",
                             )
                             i.fa.fa-fw.fa-eye
 

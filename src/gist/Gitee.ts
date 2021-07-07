@@ -44,12 +44,14 @@ class Gitee extends Gist {
             public: false,
             id: gist || ''
         };
+        const method = gist ? 'PATCH' : 'POST';
+        const url = gist ? `${this.baseUrl}/${gist}` : this.baseUrl;
 
         return new Promise(async (resolve, reject) => {
             try {
                 const result = await axios.request({
-                    method: 'POST',
-                    url: this.baseUrl,
+                    method,
+                    url,
                     data,
                 })
                 resolve(result.data.id);
