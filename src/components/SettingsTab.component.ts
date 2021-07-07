@@ -120,6 +120,8 @@ export class SyncConfigSettingsTabComponent implements OnInit {
     viewGist(): void {
         if (this.config.store.syncConfig.type === 'GitHub') {
             this.platform.openExternal('https://gist.github.com/' + this.config.store.syncConfig.gist)
+        } else if (this.config.store.syncConfig.type === 'GitLab') {
+            this.platform.openExternal('https://gitlab.com/-/snippets/' + this.config.store.syncConfig.gist)
         }
     }
 
