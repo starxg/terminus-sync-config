@@ -7,6 +7,8 @@ export class SyncConfigProvider extends ConfigProvider {
             token: '',
             gist: '',
             lastSyncTime: '-',
+            autoSync: false,
+            autoSyncIntervalSec: 60,
             encryption: false
         }
     }
