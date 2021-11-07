@@ -92,6 +92,11 @@ export class SyncConfigSettingsTabComponent implements OnInit {
                     const config = yaml.load(result.get('config.yaml').value) as any;
                     config.syncConfig = selfConfig;
                     this.config.writeRaw(yaml.dump(config));
+                } else if (result.has('config.json')) {
+                    // for compatibility
+                    const config = yaml.load(result.get('config.json').value) as any;
+                    config.syncConfig = selfConfig;
+                    this.config.writeRaw(yaml.dump(config));
                 }
 
                 if (result.has('ssh.auth.json')) {
