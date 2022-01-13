@@ -3,7 +3,8 @@
   "version": "1.0.8",
   "description": "Sync configuration files to GitHub Gist or Gitee Gist",
   "keywords": [
-    "terminus-plugin"
+    "terminus-plugin",
+    "tabby-plugin"
   ],
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",

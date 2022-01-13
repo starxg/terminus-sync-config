@@ -143,13 +143,24 @@ export class SyncConfigSettingsTabComponent implements OnInit {
     getSSHPluginAllPasswordInfos(token: string): Promise<Connection[]> {
         return new Promise(async (resolve) => {
 
-            const connections = this.config.store.ssh.connections;
+            const store = this.config.store
+
+            let connections = [];
+            if (store.version == "3" && store.profiles instanceof Array) {
+                connections = store.profiles.filter(e => e.type === 'ssh' && typeof e.options === "object" && e.options.auth === "password").map(e => {
+                    const { host, port, user } = e.options
+                    return { host, port: port || 22, user: user || 'root' };
+                })
+            } else {
+                connections = store.ssh.connections;
+            }
+
             if (!(connections instanceof Array) || connections.length < 1) {
                 resolve([]);
                 return;
             }
 
-            const isEncrypt = this.config.store.syncConfig.encryption === true;
+            const isEncrypt = store.syncConfig.encryption === true;
 
             const infos = [];
             for (const connect of connections) {
