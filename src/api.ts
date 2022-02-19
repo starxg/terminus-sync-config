@@ -4,7 +4,7 @@ import GitHub from "gist/GitHub";
 import GitLab from "gist/GitLab";
 
 
-export function syncGist(type: 'Gitee' | 'GitHub' | 'GitLab', token: string, gistId: string, files: Array<GistFile>): Promise<string> {
+export function syncGist(type: 'Gitee' | 'GitHub' | 'GitLab', token: string, baseUrl: string, gistId: string, files: Array<GistFile>): Promise<string> {
 
     return new Promise(async (resolve, reject) => {
         try {
@@ -15,7 +15,7 @@ export function syncGist(type: 'Gitee' | 'GitHub' | 'GitLab', token: string, gis
             } else if (type === 'GitHub') {
                 gist = new GitHub(token);
             } else if (type === 'GitLab') {
-                gist = new GitLab(token);
+                gist = new GitLab(token, baseUrl);
             } else {
                 throw "unknown the type " + type;
             }
@@ -28,7 +28,7 @@ export function syncGist(type: 'Gitee' | 'GitHub' | 'GitLab', token: string, gis
     });
 }
 
-export function getGist(type: string, token: string, gistId: string): Promise<Map<string, GistFile>> {
+export function getGist(type: string, token: string, baseUrl: string, gistId: string): Promise<Map<string, GistFile>> {
 
     return new Promise(async (resolve, reject) => {
         try {
@@ -39,7 +39,7 @@ export function getGist(type: string, token: string, gistId: string): Promise<Ma
             } else if (type === 'GitHub') {
                 gist = new GitHub(token);
             } else if (type === 'GitLab') {
-                gist = new GitLab(token);
+                gist = new GitLab(token, baseUrl);
             } else {
                 throw "unknown the type " + type;
             }

@@ -30,9 +30,13 @@ class GistFile {
 abstract class Gist {
 
     protected readonly token: string;
+    protected customBaseUrl: string;
 
-    constructor(token: string) {
+
+    constructor(token: string)
+    constructor(token: string, customBaseUrl?: string) {
         this.token = token;
+        this.customBaseUrl = customBaseUrl;
     }
 
     /**

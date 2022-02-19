@@ -2,10 +2,24 @@ import { Gist, GistFile } from "./Gist";
 import axios, { AxiosResponse, AxiosRequestConfig } from "axios";
 class GitLab extends Gist {
 
-    private readonly baseUrl = "https://gitlab.com/api/v4/snippets";
+    public static readonly defaultBaseUrl = "https://gitlab.com";
+    private readonly apiPath = "/api/v4/snippets";
+    
+
+    constructor(token: string, customBaseUrl?: string) {
+        super(token);
+        this.customBaseUrl = GitLab.defaultBaseUrl;
+        if (customBaseUrl) {
+            this.customBaseUrl = customBaseUrl;
+        }
+
+
+    }
+
+
 
     get(gist: string): Promise<Map<string, GistFile>> {
-        const url = `${this.baseUrl}/${gist}`;
+        const url = `${this.customBaseUrl}${this.apiPath}/${gist}`;
 
         return new Promise(async (resolve, reject) => {
             this.request({
@@ -34,7 +48,7 @@ class GitLab extends Gist {
             })
         };
 
-        const url = gist ? `${this.baseUrl}/${gist}` : this.baseUrl;
+        const url = gist ? `${this.customBaseUrl}${this.apiPath}/${gist}` : `${this.customBaseUrl}${this.apiPath}`;
         const method = gist ? 'PUT' : 'POST';
 
         return new Promise(async (resolve, reject) => {
@@ -55,7 +69,7 @@ class GitLab extends Gist {
         return new Promise(async (resolve, reject) => {
             this.request({
                 method: 'DELETE',
-                url: `${this.baseUrl}/${gist}`,
+                url: `${this.customBaseUrl}${this.apiPath}/${gist}`,
                 headers: {
                     Authorization: `Bearer ${this.token}`
                 }
@@ -69,7 +83,7 @@ class GitLab extends Gist {
         return new Promise(async (resolve, reject) => {
             this.request({
                 method: 'GET',
-                url: `${this.baseUrl}/${gist}/files/main/${path}/raw`,
+                url: `${this.customBaseUrl}${this.apiPath}/${gist}/files/main/${path}/raw`,
                 headers: {
                     Authorization: `Bearer ${this.token}`
                 },

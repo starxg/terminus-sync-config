@@ -6,6 +6,7 @@ import { PasswordStorageService } from 'services/PasswordStorage.service';
 import CryptoJS from 'crypto-js'
 import * as yaml from 'js-yaml'
 import { GistFile } from 'gist/Gist';
+import GitLab from 'gist/GitLab';
 
 /** @hidden */
 @Component({
@@ -49,7 +50,7 @@ export class SyncConfigSettingsTabComponent implements OnInit {
 
     async sync(isUploading: boolean): Promise<void> {
 
-        const { type, token, gist, encryption } = this.config.store.syncConfig;
+        const { type,baseUrl, token, gist, encryption } = this.config.store.syncConfig;
         const selfConfig = JSON.parse(JSON.stringify(this.config.store.syncConfig));
 
         if (!token) {
@@ -82,11 +83,11 @@ export class SyncConfigSettingsTabComponent implements OnInit {
                 // ssh password
                 files.push(new GistFile('ssh.auth.json', JSON.stringify(await this.getSSHPluginAllPasswordInfos(token))));
 
-                this.config.store.syncConfig.gist = await syncGist(type, token, gist, files);
+                this.config.store.syncConfig.gist = await syncGist(type, token, baseUrl, gist, files);
 
             } else {
 
-                const result = await getGist(type, token, gist);
+                const result = await getGist(type, token, baseUrl, gist);
 
                 if (result.has('config.json')) {
                     const config = yaml.load(result.get('config.json').value) as any;

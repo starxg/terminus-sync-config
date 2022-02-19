@@ -4,6 +4,7 @@ export class SyncConfigProvider extends ConfigProvider {
     defaults = {
         syncConfig: {
             type: 'Off',
+            baseUrl: '',
             token: '',
             gist: '',
             lastSyncTime: '-',
