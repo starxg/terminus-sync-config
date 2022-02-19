@@ -17,6 +17,15 @@ div.sync-config-settings-tab
 
     .row(*ngIf='config.store.syncConfig.type !== "Off"')
         .col-md-7
+            .form-line(*ngIf='config.store.syncConfig.type == "GitLab"')
+                .header
+                    .title Instance URL
+                input.form-control(
+                    type='text', 
+                    placeholder="https://gitlab.com",
+                    [(ngModel)]='config.store.syncConfig.baseUrl', 
+                    (ngModelChange)='config.save()',
+                )   
             .form-line
                 .header
                     .title Token

@@ -6,7 +6,7 @@ import { FormsModule } from '@angular/forms'
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { ConfigProvider } from 'terminus-core';
 import { SyncConfigProvider } from 'config';
-import { SyncConfigSettingsTabComponent } from 'components/settingsTab.component'
+import { SyncConfigSettingsTabComponent } from 'components/SettingsTab.component'
 import { ToggleComponent } from 'components/toggle.component'
 
 @NgModule({
