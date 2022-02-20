@@ -45,6 +45,20 @@ div.sync-config-settings-tab
                 )
             .form-line
                 .header
+                    .title Auto sync
+                    .description Auto sync every n seconds
+                input.form-control(
+                    type='number',
+                    placeholder="seconds",
+                    [(ngModel)]='config.store.syncConfig.autoSyncIntervalSec',
+                    (ngModelChange)='config.save()',
+                )
+                toggle(
+                    [(ngModel)]='config.store.syncConfig.autoSync',
+                    (ngModelChange)='autoSync(config.store.syncConfig.autoSyncIntervalSec)',
+                )
+            .form-line
+                .header
                     .title Gist
                 .input-group
                     input.form-control(
