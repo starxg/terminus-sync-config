@@ -1,6 +1,6 @@
 # Sync Config
 
-### For the [Terminus](https://github.com/Eugeny/tabby) terminal
+### For the [Tabby](https://github.com/Eugeny/tabby) terminal
 
 This plugin can Sync configuration files to GitHub Gist or Gitee Gist.
 
