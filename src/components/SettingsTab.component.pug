@@ -45,6 +45,16 @@ div.sync-config-settings-tab
                 )
             .form-line
                 .header
+                    .title EncryptUpload
+                    .description Encrypt upload to git
+                input.form-control(
+                    type='text',
+                    placeholder="encryptKey",
+                    [(ngModel)]='config.store.syncConfig.encryptKey',
+                    (ngModelChange)='config.save()',
+                )
+            .form-line
+                .header
                     .title Gist
                 .input-group
                     input.form-control(
