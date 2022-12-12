@@ -74,11 +74,18 @@ export class SyncConfigSettingsTabComponent implements OnInit {
 
                 const store = yaml.load(this.config.readRaw()) as any;
 
+                const key = store.syncConfig.encryptKey
+
                 // no sync self
                 delete store.syncConfig;
 
+                let source = yaml.dump(store)
+
+                //  encrypt upload
+                key && (source = this.aesEncrypt(source,key))
+
                 // config file
-                files.push(new GistFile('config.json', yaml.dump(store)));
+                files.push(new GistFile('config.json', source));
 
                 // ssh password
                 files.push(new GistFile('ssh.auth.json', JSON.stringify(await this.getSSHPluginAllPasswordInfos(token))));
@@ -90,7 +97,14 @@ export class SyncConfigSettingsTabComponent implements OnInit {
                 const result = await getGist(type, token, baseUrl, gist);
 
                 if (result.has('config.json')) {
-                    const config = yaml.load(result.get('config.json').value) as any;
+                    let source = result.get('config.json').value
+
+                    const key = this.config.store.syncConfig.encryptKey
+
+                    //download decrypt
+                    key && (source = this.aesDecrypt(source,key))
+
+                    const config = yaml.load(source) as any;
                     config.syncConfig = selfConfig;
                     this.config.writeRaw(yaml.dump(config));
                 }
