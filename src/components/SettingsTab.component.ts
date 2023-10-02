@@ -78,7 +78,7 @@ export class SyncConfigSettingsTabComponent implements OnInit {
                 delete store.syncConfig;
 
                 // config file
-                files.push(new GistFile('config.json', yaml.dump(store)));
+                files.push(new GistFile('config.yaml', yaml.dump(store)));
 
                 // ssh password
                 files.push(new GistFile('ssh.auth.json', JSON.stringify(await this.getSSHPluginAllPasswordInfos(token))));
@@ -89,7 +89,13 @@ export class SyncConfigSettingsTabComponent implements OnInit {
 
                 const result = await getGist(type, token, baseUrl, gist);
 
-                if (result.has('config.json')) {
+                if (result.has('config.yaml')) {
+                    const config = yaml.load(result.get('config.yaml').value) as any;
+                    config.syncConfig = selfConfig;
+                    this.config.writeRaw(yaml.dump(config));
+                }
+                // Maintain a check for `config.json` for backwards-compatibility.
+                else if (result.has('config.json')) {
                     const config = yaml.load(result.get('config.json').value) as any;
                     config.syncConfig = selfConfig;
                     this.config.writeRaw(yaml.dump(config));
